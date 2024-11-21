@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Message } from "../App";
+import ActionButtons from "./ActionButtons";
 
 interface ChatbotProps {
   messages: Message[];
@@ -34,15 +35,20 @@ function Chatbot(chatbotProps: ChatbotProps) {
       })
     })
     .then((res) => res.json())
-    .then((data) => chatbotProps.setMessages(data.response))
-    .catch((err) => console.error(`Error sending message: ${input}`, err));
-    
+    .then((data) => {
+      chatbotProps.setMessages(data.response);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error(`Error sending message: ${input}`, err);
+      setLoading(false);
+    });
     setInput(""); // Clear input
-    setLoading(false)
   };
 
   // Delete a message
   function deleteMessage(id: number) {
+    setLoading(true);
     fetch(`${backendUrl}/delete_message`, {
       method: 'POST',
       headers: {
@@ -54,8 +60,14 @@ function Chatbot(chatbotProps: ChatbotProps) {
       })
     })
     .then((res) => res.json())
-    .then((data) => chatbotProps.setMessages(data.response))
-    .catch((err) => console.error(`Error deleting message id ${id}:`, err));
+    .then((data) => {
+      chatbotProps.setMessages(data.response);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error(`Error deleting message id ${id}:`, err);
+      setLoading(false);
+    });
   };
 
   // Start editing a message
@@ -69,7 +81,7 @@ function Chatbot(chatbotProps: ChatbotProps) {
 
   // Save the edited message
   function saveEditedMessage() {
-    if(!editingId) return;
+    if(editingId === null) return;
 
     // Update message array with the user message
     chatbotProps.setMessages([
@@ -90,12 +102,17 @@ function Chatbot(chatbotProps: ChatbotProps) {
       })
     })
     .then((res) => res.json())
-    .then((data) => chatbotProps.setMessages(data.response))
-    .catch((err) => console.error(`Error editing message id: ${editingId}`, err));
+    .then((data) => {
+      chatbotProps.setMessages(data.response);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error(`Error editing message id: ${editingId}`, err);
+      setLoading(false);
+    });
     
     setEditingId(null); // Exit editing mode
     setInput(""); // Clear input
-    setLoading(false)
   };
 
   function cancelEditing() {
@@ -156,34 +173,12 @@ function Chatbot(chatbotProps: ChatbotProps) {
             className="flex-1 text-sm p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Type your message..."
           />
-
-          {
-            loading ? 
-            <div className="w-8 h-8 border-4 border-t-4 border-blue-500 rounded-full animate-spin border-solid border-e-transparent"></div>
-            : editingId ? (
-              <>
-              <button
-                onClick={saveEditedMessage}
-                className="bg-green-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-600"
-              >
-                Save
-              </button>
-              <button
-              onClick={cancelEditing}
-              className="bg-blue-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-600"
-            >
-              Cancel
-            </button>
-            </>
-            ) : (
-              <button
-                onClick={sendMessage}
-                className="bg-blue-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-600"
-              >
-                Send
-              </button>
-            )
-          }
+          <ActionButtons 
+            loading={loading} 
+            editingId={editingId} 
+            sendMessage={sendMessage} 
+            saveEditedMessage={saveEditedMessage} 
+            cancelEditing={cancelEditing} />
         </div>
       </div>
     </div>

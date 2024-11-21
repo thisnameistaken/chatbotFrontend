@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Chatbot from './components/chatbot';
+import Chatbot from './components/Chatbot';
 
 function App() {
   const [currentConversationId, setCurrentConversationId] = useState<string>("");
