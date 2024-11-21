@@ -83,7 +83,7 @@ function Chatbot(chatbotProps: ChatbotProps) {
   function saveEditedMessage() {
     if(editingId === null) return;
 
-    // Update message array with the user message
+    // Update message array with a temporary user message
     chatbotProps.setMessages([
       ...chatbotProps.messages.slice(0, editingId), 
       { id: chatbotProps.messages.length, sender: 'user', text: input }, 
@@ -122,7 +122,7 @@ function Chatbot(chatbotProps: ChatbotProps) {
   return (
     <div className="flex-col inset-0 flex h-screen">
       <div className="flex-1 p-4 overflow-y-auto">
-        {chatbotProps.messages.map((msg) => (
+        {chatbotProps.messages && chatbotProps.messages.map((msg) => (
           <div
             key={String(msg.id)}
             className={`mb-3 flex ${
